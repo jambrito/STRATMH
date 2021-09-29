@@ -2,20 +2,7 @@ stratMH<-function(X,L=3,n=NULL,cvt=0.1,p=50,pe=0.3,pm=0.3,maxgen=30,AV=TRUE,npar
 {
 strathh<-function(X,L=3,n=NULL,cvt=NULL,p=50,pe=0.3,pm=0.3,maxgen=30,AV=TRUE)
 {
-  #X = vetor com as observações populacionais
-  #L = número de estratos
-  #n = tamanho de amostra
-  #cvt = coeficiente de variação
-  #npi = número de soluções iniciais
-  #p = tamanho da população do brkga
-  #pe = tamanho do conj. elite
-  #pm = tamanho do conj. mutação
-  #maxgen  = máximo de gerações do brkga
   
-  
-  ####Constroi uma lista com valores de Nh e Vh associados a x1+...+xL=K##
-  
-  #########Constrói soluções para o brkga########################
   Build<-function(L,K,Ns)
   {
     lower<-2
@@ -152,7 +139,7 @@ strathh<-function(X,L=3,n=NULL,cvt=NULL,p=50,pe=0.3,pm=0.3,maxgen=30,AV=TRUE)
     aux<-c1[l]
     c1[l]<-c2[l]
     c2[l]<-aux
-    #Fator de correção, caso a soma > ou  < k redistribui
+
     soma1<-sum(c1[-l])
     prop<-round(d*c1[-l]/soma1)
     for(h in 1:(L-1)) {c1[es[h]]<-c1[es[h]]+prop[h]}
@@ -202,7 +189,7 @@ strathh<-function(X,L=3,n=NULL,cvt=NULL,p=50,pe=0.3,pm=0.3,maxgen=30,AV=TRUE)
     aux<-c1[l]
     c1[l]<-c2[l]
     c2[l]<-aux
-    #Fator de correção, caso a soma > ou  < k redistribui
+
     soma1<-sum(c1[-l])
     prop<-round(d*c1[-l]/soma1)
     for(h in 1:(L-1)) {c1[es[h]]<-c1[es[h]]+prop[h]}
@@ -238,7 +225,7 @@ strathh<-function(X,L=3,n=NULL,cvt=NULL,p=50,pe=0.3,pm=0.3,maxgen=30,AV=TRUE)
     
     SM=t(apply(ST,1,function(x) Fobj2(x,L,n,cvt,tx,X,Xu)))
     qx=order(SM[,3*L+2])
-    ###Testa melhor
+ 
     S[2*j-1,]<-ST[qx[1],]
     S[2*j,]<-ST[qx[length(qx)],]
     FF[2*j-1,]<-SM[qx[1],]
@@ -273,8 +260,7 @@ strathh<-function(X,L=3,n=NULL,cvt=NULL,p=50,pe=0.3,pm=0.3,maxgen=30,AV=TRUE)
   tx=sum(X)
   Xu<-sort(unique(X))
   K<-length(Xu)
-  ############# Constrói a estrutura das soluções #############
-  ################Início do brkga##############################
+ 
   tempo<-proc.time()
   s=Build(L,K,2*p)
   f=t(apply(s,1,function(x) Fobj2(x,L,n,cvt,tx,X,Xu)))
@@ -305,10 +291,10 @@ strathh<-function(X,L=3,n=NULL,cvt=NULL,p=50,pe=0.3,pm=0.3,maxgen=30,AV=TRUE)
     ibest<-ng
     } 
     
-    ####Mutação 
+  
     smutacao<-Build(L,K,nm)
     fmutacao<-t(apply(smutacao,1,function(x) Fobj2(x,L,n,cvt,tx,X,Xu)))
-    ######Cruzamento
+  
     
     scross<-cross2(s[1:ne,],s[(ne+1):p,],L,ne,p-ne,p-ne-nm,K)
     fcross<-scross$FF
@@ -330,7 +316,6 @@ strathh<-function(X,L=3,n=NULL,cvt=NULL,p=50,pe=0.3,pm=0.3,maxgen=30,AV=TRUE)
   fobj=fg[3*L+2]
   bk<-mcut(sbest,Xu,L)
   cv=sqrt(sum(Nh^2*Sh2/nh*(1-nh/Nh)))/tx
-  #stopCluster(clust)
   return(list(xbest=sbest,bk=bk,Nh=Nh,nh=nh,
               Sh2=Sh2,fobj=fobj,cv=cv,ta=tempo,ibest=ibest))  
   

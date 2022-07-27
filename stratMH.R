@@ -8,6 +8,8 @@ stratMH<-function(X,L=3,cvt=0.1,p=50,pe=0.3,pm=0.3,maxgen=50,AV=TRUE,npar=1)
 #pm = Percentage of mutant population
 #maxgen = Number of generations
 #AV = TRUE - Use antecipated variance, FALSE = Use Standard Variance
+#AV = TRUE  ==> Shx= Sum (for all xi in stratum h) (Xi-Xmed)^2 / Nh
+#AV = FALSE ==> Shx= Sum (for all xi in stratum h) (Xi-Xmed)^2 / (Nh-1)
 #npar > 1 = Run the algorithm with parallelism
   
 strathh<-function(X,L=3,cvt=0.1,p=50,pe=0.3,pm=0.3,maxgen=50,AV=TRUE)
@@ -49,18 +51,27 @@ Fobj<-function(x,L,cvt,tx,X,Xu)
   sa<-cumsum(x)
   for(h in 1:(L-1)) 
     { ca<-NhVh(X,Xu,bi,bj) 
+      #Total population units in the stratum h
       Nh[h]<-ca$Nh
+      #Populational Variance  of X in the stratum h
       Vh[h]<-ca$Vh
       bi<-bj+1
       bj<-sa[h+1]
     }
     ca<-NhVh(X,Xu,bi,bj)  
-    Nh[L]<-ca$Nh
+    Nh[L]<-ca$Nh  
     Vh[L]<-ca$Vh
+    #Function that implements the proposed method in 
+    #J. A. M. Brito, P. L. N. Silva, G.S. Semaan, N. Maculan, N, 
+    #Integer Programming Formulations Applied to Optimal Allocation in Stratified Sampling, Survey Methodology, 41(2)
+    #(2015), pp. 427-442.
     A=BSSM_FC(Nh,Vh,tx,cvt) 
+    #Total number of sample units allocated to the stratum h
     nh=A$nh
+    #Total sample size
     n=A$n
-    cv=A$cvs
+    #cv = Coefficient of variation produced by algorithm
+    cv=A$cvs  
     return(c(Nh,Vh,nh,cv,n))
 }  
   
@@ -101,7 +112,8 @@ if (length(z>0))
     nh=A$nh
     n=A$n
    }
-cv=sqrt(sum(Nh^2*Vh*(1-nh/Nh)))/tx
+#cv = Coefficient of variation produced by algorithm
+cv=sqrt(sum(Nh^2*Vh*(1-nh/Nh)))/tx 
 return(c(Nh,Vh,nh,cv,n))
 }  
 
@@ -197,7 +209,12 @@ Xu<-sort(unique(X))
 K<-length(Xu)
 time_CPU<-proc.time()
 #Algorithm main code
+#Call the function that builds the algorithm's 
+#initial solutions - line 3 of the pseudocode
 s=Build(L,K,2*p)
+#Calculate the objective function for each generated 
+#solution, that is, sample size n and additional information 
+#associated with the solution: cv,nh, Nh,...
 f=t(apply(s,1,function(x) Fobj2(x,L,cvt,tx,X,Xu)))
 idx<-order(f[,3*L+2])
 s<-s[idx[1:p],]
@@ -221,11 +238,11 @@ while((ng<maxgen) & (ng-ibest<=round(0.3*maxgen)))
        cat("Generation ",ng,Message,fbest,"\n")
        ibest<-ng
       } 
-  
+    #Build new solutions (Mutation) - line 17 of the pseudocode
     smutacao<-Build(L,K,nm)
     fmutacao<-t(apply(smutacao,1,function(x) Fobj2(x,L,cvt,tx,X,Xu)))
   
-    
+    #Apply the crossover - pseudocode line 18 and figure 2
     scross<-crossover(s[1:ne,],s[(ne+1):p,],L,ne,p-ne,p-ne-nm,K)
     fcross<-scross$FF
     scross<-scross$S
@@ -238,7 +255,7 @@ fg<-Fobj(sbest,L,cvt,tx,X,Xu)
 r=c("cv","n")
 cat("Best Solution ",r[1]," = ",fg[3*L+1]," ",r[2]," = ",fg[3*L+2],"\n")
 time_CPU<-(proc.time()-time_CPU)[3]
-
+#Solution associated with the smallest sample size n
 Nh=fg[1:L]
 Sh2=fg[(L+1):(2*L)]
 nh=fg[(2*L+1):(3*L)]

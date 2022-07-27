@@ -8,8 +8,8 @@ stratMH<-function(X,L=3,cvt=0.1,p=50,pe=0.3,pm=0.3,maxgen=50,AV=TRUE,npar=1)
 #pm = Percentage of mutant population
 #maxgen = Number of generations
 #AV = TRUE - Use antecipated variance, FALSE = Use Standard Variance
-#AV = TRUE  ==> Shx= Sum (for all xi in stratum h) (Xi-Xmed)^2 / Nh
-#AV = FALSE ==> Shx= Sum (for all xi in stratum h) (Xi-Xmed)^2 / (Nh-1)
+#AV = TRUE  ==> Sxh= Sum (for all xi in stratum h) (Xi-Xmed)^2 / Nh
+#AV = FALSE ==> Sxh= Sum (for all xi in stratum h) (Xi-Xmed)^2 / (Nh-1)
 #npar > 1 = Run the algorithm with parallelism
   
 strathh<-function(X,L=3,cvt=0.1,p=50,pe=0.3,pm=0.3,maxgen=50,AV=TRUE)

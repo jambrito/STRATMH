@@ -51,7 +51,7 @@ return(G)
 #Create a directory called experiments
 #copy populations to experiments directory
 #Copy this file and files stratMH.R and Barcarolli.R to  directory experiments
-setwd("G:\\Experiments")
+setwd("\\Experiments") 
 X1=scan("BeefFarms.txt")
 X2=scan("chi1.txt",dec=".")
 s1=RunAlgs(X1,0.1,3)
